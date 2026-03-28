@@ -1,0 +1,1072 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Catat Belanja</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #1a1814;
+      --bg-card: #252118;
+      --bg-elevated: #2d281e;
+      --fg: #f5f0e8;
+      --fg-muted: #a39a8a;
+      --accent: #8fbc7b;
+      --accent-hover: #a8d494;
+      --danger: #e07a5f;
+      --warning: #e9c46a;
+      --border: #3d362a;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'DM Sans', sans-serif;
+      background: var(--bg);
+      color: var(--fg);
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    h1, h2, h3, h4 {
+      font-family: 'Space Grotesk', sans-serif;
+    }
+
+    /* Background Pattern */
+    .bg-pattern {
+      position: fixed;
+      inset: 0;
+      z-index: 0;
+      background: 
+        radial-gradient(ellipse 80% 50% at 20% 0%, rgba(143, 188, 123, 0.15) 0%, transparent 50%),
+        radial-gradient(ellipse 60% 40% at 80% 100%, rgba(224, 122, 95, 0.1) 0%, transparent 50%),
+        var(--bg);
+    }
+
+    .bg-pattern::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.02'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+    }
+
+    .glass-card {
+      background: rgba(37, 33, 24, 0.8);
+      backdrop-filter: blur(20px);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+    }
+
+    /* Animations */
+    @keyframes fadeInUp {
+      from {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @keyframes scaleIn {
+      from {
+        opacity: 0;
+        transform: scale(0.9);
+      }
+      to {
+        opacity: 1;
+        transform: scale(1);
+      }
+    }
+
+    @keyframes slideInRight {
+      from {
+        opacity: 0;
+        transform: translateX(30px);
+      }
+      to {
+        opacity: 1;
+        transform: translateX(0);
+      }
+    }
+
+    @keyframes pulse-glow {
+      0%, 100% { box-shadow: 0 0 20px rgba(143, 188, 123, 0.2); }
+      50% { box-shadow: 0 0 40px rgba(143, 188, 123, 0.4); }
+    }
+
+    .animate-fade-in-up {
+      animation: fadeInUp 0.6s ease-out forwards;
+    }
+
+    .animate-scale-in {
+      animation: scaleIn 0.4s ease-out forwards;
+    }
+
+    .animate-slide-in {
+      animation: slideInRight 0.5s ease-out forwards;
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        transition-duration: 0.01ms !important;
+      }
+    }
+
+    /* Custom Scrollbar */
+    ::-webkit-scrollbar {
+      width: 6px;
+    }
+    ::-webkit-scrollbar-track {
+      background: var(--bg);
+    }
+    ::-webkit-scrollbar-thumb {
+      background: var(--border);
+      border-radius: 3px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: var(--fg-muted);
+    }
+
+    /* Input Styles */
+    .input-field {
+      background: var(--bg-elevated);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 12px 16px;
+      color: var(--fg);
+      font-size: 15px;
+      transition: all 0.3s ease;
+      width: 100%;
+    }
+
+    .input-field:focus {
+      outline: none;
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(143, 188, 123, 0.15);
+    }
+
+    .input-field::placeholder {
+      color: var(--fg-muted);
+    }
+
+    /* Button Styles */
+    .btn-primary {
+      background: var(--accent);
+      color: var(--bg);
+      font-weight: 600;
+      padding: 14px 24px;
+      border-radius: 12px;
+      border: none;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      font-size: 15px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+
+    .btn-primary:hover {
+      background: var(--accent-hover);
+      transform: translateY(-2px);
+      box-shadow: 0 8px 20px rgba(143, 188, 123, 0.3);
+    }
+
+    .btn-primary:active {
+      transform: translateY(0);
+    }
+
+    .btn-primary:focus-visible {
+      outline: 2px solid var(--accent);
+      outline-offset: 2px;
+    }
+
+    /* Toggle Button Group */
+    .toggle-group {
+      display: flex;
+      background: var(--bg-elevated);
+      border-radius: 12px;
+      padding: 4px;
+      gap: 4px;
+    }
+
+    .toggle-btn {
+      padding: 10px 20px;
+      border-radius: 8px;
+      border: none;
+      background: transparent;
+      color: var(--fg-muted);
+      cursor: pointer;
+      transition: all 0.3s ease;
+      font-weight: 500;
+      font-size: 14px;
+    }
+
+    .toggle-btn.active {
+      background: var(--accent);
+      color: var(--bg);
+    }
+
+    .toggle-btn:hover:not(.active) {
+      color: var(--fg);
+    }
+
+    .toggle-btn:focus-visible {
+      outline: 2px solid var(--accent);
+      outline-offset: -2px;
+    }
+
+    /* Item Card */
+    .item-card {
+      background: var(--bg-elevated);
+      border-radius: 16px;
+      padding: 16px;
+      border: 1px solid var(--border);
+      transition: all 0.3s ease;
+      cursor: default;
+    }
+
+    .item-card:hover {
+      border-color: var(--accent);
+      transform: translateX(4px);
+    }
+
+    .delete-btn {
+      background: transparent;
+      border: none;
+      color: var(--fg-muted);
+      cursor: pointer;
+      padding: 8px;
+      border-radius: 8px;
+      transition: all 0.3s ease;
+    }
+
+    .delete-btn:hover {
+      background: rgba(224, 122, 95, 0.15);
+      color: var(--danger);
+    }
+
+    .delete-btn:focus-visible {
+      outline: 2px solid var(--danger);
+      outline-offset: 2px;
+    }
+
+    /* Stats Card */
+    .stats-card {
+      background: linear-gradient(135deg, var(--bg-elevated) 0%, rgba(143, 188, 123, 0.1) 100%);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 20px;
+      transition: all 0.3s ease;
+    }
+
+    .stats-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 12px 30px rgba(0, 0, 0, 0.3);
+    }
+
+    /* Empty State */
+    .empty-state {
+      text-align: center;
+      padding: 60px 20px;
+    }
+
+    .empty-icon {
+      width: 80px;
+      height: 80px;
+      margin: 0 auto 20px;
+      background: var(--bg-elevated);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    /* Label */
+    .label {
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--fg-muted);
+      margin-bottom: 8px;
+      display: block;
+    }
+
+    /* Type Selector */
+    .type-selector {
+      display: flex;
+      gap: 12px;
+    }
+
+    .type-option {
+      flex: 1;
+      padding: 12px;
+      border: 2px solid var(--border);
+      border-radius: 12px;
+      background: transparent;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      text-align: center;
+    }
+
+    .type-option.selected {
+      border-color: var(--accent);
+      background: rgba(143, 188, 123, 0.1);
+    }
+
+    .type-option:hover:not(.selected) {
+      border-color: var(--fg-muted);
+    }
+
+    .type-option:focus-visible {
+      outline: 2px solid var(--accent);
+      outline-offset: 2px;
+    }
+
+    /* Progress Bar */
+    .progress-bar {
+      height: 8px;
+      background: var(--bg);
+      border-radius: 4px;
+      overflow: hidden;
+    }
+
+    .progress-fill {
+      height: 100%;
+      background: linear-gradient(90deg, var(--accent), var(--accent-hover));
+      border-radius: 4px;
+      transition: width 0.5s ease;
+    }
+
+    /* Category Badge */
+    .category-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 4px 10px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 500;
+    }
+
+    .category-satuan {
+      background: rgba(143, 188, 123, 0.15);
+      color: var(--accent);
+    }
+
+    .category-kiloan {
+      background: rgba(233, 196, 106, 0.15);
+      color: var(--warning);
+    }
+
+    /* Stagger animation delays */
+    .stagger-1 { animation-delay: 0.1s; }
+    .stagger-2 { animation-delay: 0.2s; }
+    .stagger-3 { animation-delay: 0.3s; }
+    .stagger-4 { animation-delay: 0.4s; }
+
+    /* Number animation */
+    .number-animate {
+      transition: all 0.3s ease;
+    }
+
+    /* Floating Action */
+    .fab {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      width: 60px;
+      height: 60px;
+      border-radius: 50%;
+      background: var(--accent);
+      border: none;
+      color: var(--bg);
+      cursor: pointer;
+      box-shadow: 0 8px 30px rgba(143, 188, 123, 0.4);
+      transition: all 0.3s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 50;
+    }
+
+    .fab:hover {
+      transform: scale(1.1);
+      box-shadow: 0 12px 40px rgba(143, 188, 123, 0.5);
+    }
+
+    .fab:focus-visible {
+      outline: 2px solid var(--fg);
+      outline-offset: 4px;
+    }
+
+    /* Modal */
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.7);
+      backdrop-filter: blur(8px);
+      z-index: 100;
+      display: flex;
+      align-items: flex-end;
+      justify-content: center;
+      padding: 20px;
+      opacity: 0;
+      visibility: hidden;
+      transition: all 0.3s ease;
+    }
+
+    .modal-overlay.active {
+      opacity: 1;
+      visibility: visible;
+    }
+
+    .modal-content {
+      background: var(--bg-card);
+      border-radius: 24px 24px 20px 20px;
+      padding: 24px;
+      width: 100%;
+      max-width: 500px;
+      max-height: 90vh;
+      overflow-y: auto;
+      transform: translateY(100%);
+      transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .modal-overlay.active .modal-content {
+      transform: translateY(0);
+    }
+
+    @media (min-width: 640px) {
+      .modal-content {
+        border-radius: 24px;
+        margin: auto;
+      }
+    }
+
+    /* Drag indicator */
+    .drag-indicator {
+      width: 40px;
+      height: 4px;
+      background: var(--border);
+      border-radius: 2px;
+      margin: 0 auto 20px;
+    }
+  </style>
+</head>
+<body>
+  <div class="bg-pattern" aria-hidden="true"></div>
+
+  <main class="relative z-10 min-h-screen pb-24">
+    <!-- Header -->
+    <header class="p-6 md:p-8">
+      <div class="max-w-2xl mx-auto animate-fade-in-up">
+        <div class="flex items-center justify-between mb-2">
+          <h1 class="text-2xl md:text-3xl font-bold tracking-tight">Catatan Belanja</h1>
+          <button id="clearAllBtn" class="text-sm text-[var(--fg-muted)] hover:text-[var(--danger)] transition-colors" aria-label="Hapus semua data">
+            Reset
+          </button>
+        </div>
+        <p class="text-[var(--fg-muted)]">Kelola pengeluaran belanjamu dengan mudah</p>
+      </div>
+    </header>
+
+    <!-- Stats Section -->
+    <section class="px-6 md:px-8 mb-6" aria-label="Statistik pengeluaran">
+      <div class="max-w-2xl mx-auto">
+        <div class="grid grid-cols-2 gap-4 animate-fade-in-up stagger-1" style="opacity: 0;">
+          <div class="stats-card">
+            <p class="text-sm text-[var(--fg-muted)] mb-1">Total Minggu Ini</p>
+            <p id="weeklyTotal" class="text-2xl font-bold text-[var(--accent)] number-animate">Rp 0</p>
+            <div class="mt-3">
+              <div class="flex justify-between text-xs text-[var(--fg-muted)] mb-1">
+                <span>Items</span>
+                <span id="weeklyCount">0 barang</span>
+              </div>
+            </div>
+          </div>
+          <div class="stats-card">
+            <p class="text-sm text-[var(--fg-muted)] mb-1">Total Bulan Ini</p>
+            <p id="monthlyTotal" class="text-2xl font-bold text-[var(--warning)] number-animate">Rp 0</p>
+            <div class="mt-3">
+              <div class="flex justify-between text-xs text-[var(--fg-muted)] mb-1">
+                <span>Items</span>
+                <span id="monthlyCount">0 barang</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Filter Tabs -->
+    <section class="px-6 md:px-8 mb-6">
+      <div class="max-w-2xl mx-auto animate-fade-in-up stagger-2" style="opacity: 0;">
+        <div class="flex items-center justify-between gap-4 flex-wrap">
+          <div class="toggle-group" role="tablist" aria-label="Filter waktu">
+            <button class="toggle-btn active" data-filter="all" role="tab" aria-selected="true">Semua</button>
+            <button class="toggle-btn" data-filter="weekly" role="tab" aria-selected="false">Mingguan</button>
+            <button class="toggle-btn" data-filter="monthly" role="tab" aria-selected="false">Bulanan</button>
+          </div>
+          <div class="text-sm text-[var(--fg-muted)]">
+            <span id="itemCount">0 item</span>
+          </div>
+        </div>
+      </div>
+    </section>
+    <section class="px-6 md:px-8 mb-6">
+  <div class="max-w-2xl mx-auto animate-fade-in-up stagger-3" style="opacity: 0;">
+    <div class="relative">
+      <span class="absolute inset-y-0 left-4 flex items-center text-[var(--fg-muted)]">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+        </svg>
+      </span>
+      <input type="text" id="searchInput" class="input-field !pl-12" placeholder="Cari nama barang...">
+    </div>
+  </div>
+</section>
+
+    <!-- Items List -->
+    <section class="px-6 md:px-8" aria-label="Daftar belanja">
+      <div class="max-w-2xl mx-auto">
+        <div id="itemsList" class="space-y-3 animate-fade-in-up stagger-3" style="opacity: 0;">
+          <!-- Items will be rendered here -->
+        </div>
+        <div id="emptyState" class="empty-state glass-card hidden">
+          <div class="empty-icon">
+            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" class="text-[var(--fg-muted)]">
+              <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/>
+              <line x1="3" y1="6" x2="21" y2="6"/>
+              <path d="M16 10a4 4 0 0 1-8 0"/>
+            </svg>
+          </div>
+          <h3 class="text-lg font-semibold mb-2">Belum ada catatan</h3>
+          <p class="text-[var(--fg-muted)] text-sm">Mulai catat pengeluaran belanjamu</p>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- FAB Button -->
+  <button id="addBtn" class="fab" aria-label="Tambah item belanja">
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
+      <line x1="12" y1="5" x2="12" y2="19"/>
+      <line x1="5" y1="12" x2="19" y2="12"/>
+    </svg>
+  </button>
+
+  <!-- Modal -->
+<div id="modal" class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+  <div class="modal-content">
+    <div class="drag-indicator"></div>
+    <div class="flex items-center justify-between mb-6">
+      <h2 id="modalTitle" class="text-xl font-bold">Tambah Belanja</h2>
+      <button id="closeModal" class="delete-btn" aria-label="Tutup modal">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+          <line x1="18" y1="6" x2="6" y2="18"/>
+          <line x1="6" y1="6" x2="18" y2="18"/>
+        </svg>
+      </button>
+    </div>
+
+    <form id="itemForm" class="space-y-5">
+      <div>
+        <label class="label text-[var(--accent)]">Kategori</label>
+        <select id="itemCategory" class="input-field w-full appearance-none cursor-pointer border-[var(--accent)]/30">
+          <option value="Sembako">Sembako 🌾</option>
+          <option value="Jajanan">Jajanan 🍿</option>
+          <option value="Dapur">Bumbu & Dapur 🍳</option>
+          <option value="Mandi">Sabun & Mandi 🧼</option>
+          <option value="Lainnya">Lain-lain ✨</option>
+        </select>
+      </div>
+
+      <div>
+        <label for="itemName" class="label">Nama Barang</label>
+        <input type="text" id="itemName" class="input-field" placeholder="Contoh: Beras, Gula, Minyak..." required>
+      </div>
+
+      <div>
+        <label class="label">Tipe Pembelian</label>
+        <div class="type-selector" role="radiogroup">
+          <button type="button" class="type-option selected" data-type="satuan">
+            <span class="font-medium text-sm">Satuan</span>
+          </button>
+          <button type="button" class="type-option" data-type="kiloan">
+            <span class="font-medium text-sm">Kiloan</span>
+          </button>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-2 gap-4">
+        <div>
+          <label for="quantity" class="label" id="qtyLabel">Jumlah (pcs)</label>
+          <input type="number" id="quantity" class="input-field" placeholder="0" min="0" step="any" required>
+        </div>
+        <div>
+          <label for="unitPrice" class="label" id="priceLabel">Harga Satuan</label>
+          <input type="number" id="unitPrice" class="input-field" placeholder="0" min="0" required>
+        </div>
+      </div>
+
+      <div id="unitSelector" class="hidden">
+        <div class="toggle-group !bg-[var(--bg)]">
+          <button type="button" class="toggle-btn active" data-unit="kg">kg</button>
+          <button type="button" class="toggle-btn" data-unit="ons">ons</button>
+          <button type="button" class="toggle-btn" data-unit="gram">gram</button>
+        </div>
+      </div>
+
+      <div class="bg-[var(--bg)] rounded-xl p-4 border border-[var(--border)]">
+        <div class="flex justify-between items-center">
+          <span class="text-[var(--fg-muted)]">Total Harga</span>
+          <span id="totalPreview" class="text-xl font-bold text-[var(--accent)]">Rp 0</span>
+        </div>
+      </div>
+
+      <button type="submit" class="btn-primary w-full">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" class="mr-2">
+          <polyline points="20 6 9 17 4 12"/>
+        </svg>
+        Simpan Catatan
+      </button>
+    </form>
+  </div>
+</div>
+
+<div id="actionMenu" class="modal-overlay" role="dialog">
+  <div class="modal-content !max-w-[320px] !pb-6">
+    <div class="drag-indicator"></div>
+    <h3 id="actionMenuTitle" class="text-center font-bold text-lg mb-6 text-[var(--fg)]">Pilih Aksi</h3>
+    <div class="space-y-3">
+      <button id="editActionBtn" class="btn-primary w-full !bg-[var(--bg-elevated)] !text-[var(--fg)] border border-[var(--border)] hover:!border-[var(--accent)]">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="mr-2 inline">
+          <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
+        </svg>
+        Edit Catatan
+      </button>
+
+      <button id="duplicateActionBtn" class="btn-primary w-full">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="mr-2 inline">
+          <polyline points="20 6 9 17 4 12"/>
+        </svg>
+        Checklist (Catat Baru)
+      </button>
+
+      <button id="cancelActionBtn" class="w-full py-3 text-sm text-[var(--fg-muted)] hover:text-[var(--fg)] transition-colors">
+        Batal
+      </button>
+    </div>
+  </div>
+</div>
+
+  <script>
+// --- 1. STATE & VARIABLES ---
+let items = [];
+let currentFilter = 'all';
+let selectedType = 'satuan';
+let selectedUnit = 'kg';
+let editingId = null; 
+let pressTimer;
+let activeItemId = null;
+const searchInput = document.getElementById('searchInput');
+
+// --- 2. DOM ELEMENTS ---
+const modal = document.getElementById('modal');
+const modalTitle = document.getElementById('modalTitle');
+const itemForm = document.getElementById('itemForm');
+const itemsList = document.getElementById('itemsList');
+const emptyState = document.getElementById('emptyState');
+const weeklyTotal = document.getElementById('weeklyTotal');
+const monthlyTotal = document.getElementById('monthlyTotal');
+const weeklyCount = document.getElementById('weeklyCount');
+const monthlyCount = document.getElementById('monthlyCount');
+const itemCount = document.getElementById('itemCount');
+const totalPreview = document.getElementById('totalPreview');
+const calcDetail = document.getElementById('calcDetail');
+const unitSelector = document.getElementById('unitSelector');
+const qtyLabel = document.getElementById('qtyLabel');
+const priceLabel = document.getElementById('priceLabel');
+
+// Elements untuk Action Menu (Pop-up baru)
+const actionMenu = document.getElementById('actionMenu');
+const actionMenuTitle = document.getElementById('actionMenuTitle');
+const editActionBtn = document.getElementById('editActionBtn');
+const duplicateActionBtn = document.getElementById('duplicateActionBtn');
+const cancelActionBtn = document.getElementById('cancelActionBtn');
+
+// --- 3. INITIALIZATION ---
+function init() {
+    loadFromStorage();
+    renderItems();
+    updateStats();
+    setupEventListeners();
+    triggerEntranceAnimations();
+}
+
+searchInput.addEventListener('input', () => {
+    renderItems(); // Setiap ngetik, daftar barang akan di-render ulang
+});
+
+function setupEventListeners() {
+    // Tombol Tambah Utama
+    document.getElementById('addBtn').addEventListener('click', () => openModal());
+    
+    // Modal Controls
+    document.getElementById('closeModal').addEventListener('click', closeModalFn);
+    modal.addEventListener('click', (e) => { if (e.target === modal) closeModalFn(); });
+    
+    // Form & Input
+    itemForm.addEventListener('submit', handleSubmit);
+    document.getElementById('quantity').addEventListener('input', updatePreview);
+    document.getElementById('unitPrice').addEventListener('input', updatePreview);
+
+    // Filter Logic
+    document.querySelectorAll('.toggle-group [data-filter]').forEach(btn => {
+        btn.addEventListener('click', () => {
+            document.querySelectorAll('.toggle-group [data-filter]').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            currentFilter = btn.dataset.filter;
+            renderItems();
+        });
+    });
+
+    // Type & Unit Selector
+    document.querySelectorAll('.type-option').forEach(opt => {
+        opt.addEventListener('click', () => {
+            document.querySelectorAll('.type-option').forEach(o => o.classList.remove('selected'));
+            opt.classList.add('selected');
+            selectedType = opt.dataset.type;
+            updateFormLabels();
+            updatePreview();
+        });
+    });
+
+    document.querySelectorAll('#unitSelector .toggle-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+            document.querySelectorAll('#unitSelector .toggle-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            selectedUnit = btn.dataset.unit;
+            updatePreview();
+        });
+    });
+
+    // Action Menu Listeners
+    editActionBtn.addEventListener('click', () => {
+        const item = items.find(i => i.id === activeItemId);
+        closeActionMenu();
+        openModal(item);
+    });
+
+    duplicateActionBtn.addEventListener('click', () => {
+        const item = items.find(i => i.id === activeItemId);
+        const newItem = {
+            ...item,
+            id: Date.now(),
+            date: new Date().toISOString()
+        };
+        items.unshift(newItem);
+        saveToStorage();
+        renderItems();
+        updateStats();
+        closeActionMenu();
+    });
+
+    cancelActionBtn.addEventListener('click', closeActionMenu);
+    actionMenu.addEventListener('click', (e) => { if (e.target === actionMenu) closeActionMenu(); });
+
+    // Reset Data
+    document.getElementById('clearAllBtn').addEventListener('click', () => {
+        if (confirm('Hapus semua data belanja?')) {
+            items = [];
+            saveToStorage();
+            renderItems();
+            updateStats();
+        }
+    });
+}
+
+// --- 4. CORE LOGIC (EDIT & ADD) ---
+function openModal(itemToEdit = null) {
+    // 1. CEK: Apakah ini EDIT atau BARANG BARU?
+    if (itemToEdit) {
+        // --- KONDISI EDIT (Formulir diisi data lama) ---
+        editingId = itemToEdit.id;
+        modalTitle.textContent = "Edit Catatan";
+        
+        // Isi kotak-kotak input dengan data yang sudah ada
+        document.getElementById('itemName').value = itemToEdit.name;
+        document.getElementById('quantity').value = itemToEdit.quantity;
+        document.getElementById('unitPrice').value = itemToEdit.unitPrice;
+        
+        // Pilih Kategori yang sesuai (Sembako/Jajanan/dll)
+        const catInput = document.getElementById('itemCategory');
+        if (catInput) catInput.value = itemToEdit.category || 'Sembako';
+
+        // Atur Tipe (Satuan/Kiloan) dan Satuan (kg/gram)
+        selectedType = itemToEdit.type;
+        selectedUnit = itemToEdit.unit;
+
+        // Nyalakan tombol yang terpilih (biar warnanya berubah)
+        document.querySelectorAll('.type-option').forEach(opt => {
+            opt.classList.toggle('selected', opt.dataset.type === selectedType);
+        });
+        document.querySelectorAll('#unitSelector .toggle-btn').forEach(btn => {
+            btn.classList.toggle('active', btn.dataset.unit === selectedUnit);
+        });
+
+    } else {
+        // --- KONDISI BARU (Formulir dikosongkan) ---
+        editingId = null;
+        modalTitle.textContent = "Tambah Belanja";
+        itemForm.reset(); // Hapus semua tulisan di input
+        
+        // Reset pilihan ke default (Sembako & Satuan)
+        if(document.getElementById('itemCategory')) {
+            document.getElementById('itemCategory').value = 'Sembako';
+        }
+        selectedType = 'satuan';
+        selectedUnit = 'kg';
+    }
+    
+    // 2. JALANKAN TAMPILAN
+    updateFormLabels(); // Ganti tulisan "pcs" atau "kg" di label
+    updatePreview();    // Hitung total harga (Qty x Harga)
+    
+    // 3. MUNCULKAN MODAL KE LAYAR
+    modal.classList.add('active');
+    document.body.style.overflow = 'hidden'; // Biar layar belakang nggak bisa di-scroll
+}
+
+function closeModalFn() {
+    modal.classList.remove('active');
+    document.body.style.overflow = '';
+}
+
+function handleSubmit(e) {
+    e.preventDefault();
+    const name = document.getElementById('itemName').value.trim();
+    const qty = parseFloat(document.getElementById('quantity').value) || 0;
+    const price = parseFloat(document.getElementById('unitPrice').value) || 0;
+    const category = document.getElementById('itemCategory').value;
+
+    const itemData = {
+        id: editingId || Date.now(),
+        name,
+        type: selectedType,
+        category: category,
+        unit: selectedType === 'kiloan' ? selectedUnit : 'pcs',
+        quantity: qty,
+        unitPrice: price,
+        total: qty * price,
+        date: editingId ? items.find(i => i.id === editingId).date : new Date().toISOString()
+    };
+
+    if (editingId) {
+        const index = items.findIndex(i => i.id === editingId);
+        items[index] = itemData;
+    } else {
+        items.unshift(itemData);
+    }
+
+    saveToStorage();
+    renderItems();
+    updateStats();
+    closeModalFn();
+}
+
+// --- 5. LONG PRESS LOGIC ---
+function handlePressStart(id) {
+    const card = document.querySelector(`[data-id="${id}"]`);
+    card.style.transform = "scale(0.96)";
+    card.style.transition = "transform 0.2s";
+    
+    pressTimer = setTimeout(() => {
+        card.style.transform = "";
+        activeItemId = id;
+        const item = items.find(i => i.id === id);
+        actionMenuTitle.textContent = item.name;
+        actionMenu.classList.add('active');
+        document.body.style.overflow = 'hidden';
+        if(navigator.vibrate) navigator.vibrate(50);
+    }, 600);
+}
+
+function handlePressEnd(id) {
+    clearTimeout(pressTimer);
+    const card = document.querySelector(`[data-id="${id}"]`);
+    if(card) card.style.transform = "";
+}
+
+function closeActionMenu() {
+    actionMenu.classList.remove('active');
+    document.body.style.overflow = '';
+}
+
+// --- 6. UTILITY & RENDER ---
+function renderItems() {
+    const filtered = filterItems();
+    if (filtered.length === 0) {
+        itemsList.innerHTML = '';
+        emptyState.classList.remove('hidden');
+        itemCount.textContent = '0 item';
+        return;
+    }
+
+    emptyState.classList.add('hidden');
+    itemCount.textContent = `${filtered.length} item`;
+
+    itemsList.innerHTML = filtered.map((item, index) => {
+        // Logika Warna Kategori
+        let categoryClass = 'bg-gray-500/20 text-gray-400 border-gray-500/30'; // Default
+        if (item.category === 'Sembako') categoryClass = 'bg-blue-500/20 text-blue-400 border-blue-500/30';
+        else if (item.category === 'Jajanan') categoryClass = 'bg-orange-500/20 text-orange-400 border-orange-500/30';
+        else if (item.category === 'Dapur') categoryClass = 'bg-green-500/20 text-green-400 border-green-500/30';
+        else if (item.category === 'Mandi') categoryClass = 'bg-purple-500/20 text-purple-400 border-purple-500/30';
+
+        return `
+        <article class="item-card animate-slide-in" 
+            style="animation-delay: ${index * 0.05}s" 
+            data-id="${item.id}"
+            onmousedown="handlePressStart(${item.id})" 
+            onmouseup="handlePressEnd(${item.id})" 
+            ontouchstart="handlePressStart(${item.id})" 
+            ontouchend="handlePressEnd(${item.id})">
+            <div class="flex items-start justify-between gap-4">
+                <div class="flex-1 min-w-0 pointer-events-none">
+                    <div class="flex items-center gap-2 mb-1 flex-wrap">
+                        <h3 class="font-semibold text-base truncate">${item.name}</h3>
+                        <span class="px-2 py-0.5 rounded text-[9px] font-bold uppercase tracking-wider border ${categoryClass}">
+                            ${item.category || 'Lainnya'}
+                        </span>
+                    </div>
+                    <p class="text-[var(--fg-muted)] text-sm">
+                        ${item.quantity} ${item.unit} x ${formatCurrency(item.unitPrice)}
+                    </p>
+                    <p class="text-xs text-[var(--fg-muted)] mt-1">${formatDate(item.date)}</p>
+                </div>
+                <div class="text-right">
+                    <p class="font-bold text-lg text-[var(--accent)]">${formatCurrency(item.total)}</p>
+                    <button class="delete-btn mt-2" onclick="event.stopPropagation(); deleteItem(${item.id})">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M3 6h18M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+        </article>
+    `}).join('');
+}
+
+function updateStats() {
+    const now = new Date();
+    const weekAgo = new Date(now - 7 * 86400000);
+    const monthAgo = new Date(now - 30 * 86400000);
+
+    const wItems = items.filter(i => new Date(i.date) >= weekAgo);
+    const mItems = items.filter(i => new Date(i.date) >= monthAgo);
+
+    weeklyTotal.textContent = formatCurrency(wItems.reduce((s, i) => s + i.total, 0));
+    monthlyTotal.textContent = formatCurrency(mItems.reduce((s, i) => s + i.total, 0));
+    weeklyCount.textContent = `${wItems.length} barang`;
+    monthlyCount.textContent = `${mItems.length} barang`;
+}
+
+function deleteItem(id) {
+    if(confirm('Hapus item ini?')) {
+        items = items.filter(i => i.id !== id);
+        saveToStorage(); renderItems(); updateStats();
+    }
+}
+
+function formatCurrency(num) { return 'Rp ' + num.toLocaleString('id-ID'); }
+function formatDate(dateStr) { return new Date(dateStr).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' }); }
+function updateFormLabels() {
+    qtyLabel.textContent = selectedType === 'satuan' ? 'Jumlah (pcs)' : 'Berat';
+    priceLabel.textContent = selectedType === 'satuan' ? 'Harga Satuan' : 'Harga per kg';
+    unitSelector.classList.toggle('hidden', selectedType === 'satuan');
+}
+function updatePreview() {
+    const qty = parseFloat(document.getElementById('quantity').value) || 0;
+    const price = parseFloat(document.getElementById('unitPrice').value) || 0;
+    totalPreview.textContent = formatCurrency(qty * price);
+}
+function filterItems() {
+    const now = new Date();
+    const searchTerm = searchInput.value.toLowerCase(); // Ambil teks pencarian
+
+    return items.filter(item => {
+        // Filter Pencarian Teks
+        const matchesSearch = item.name.toLowerCase().includes(searchTerm);
+        
+        // Filter Waktu (Mingguan/Bulanan)
+        let matchesTime = true;
+        if (currentFilter === 'weekly') {
+            matchesTime = (now - new Date(item.date)) < 7 * 86400000;
+        } else if (currentFilter === 'monthly') {
+            matchesTime = (now - new Date(item.date)) < 30 * 86400000;
+        }
+
+        return matchesSearch && matchesTime;
+    });
+}
+
+function updateStats() {
+    const now = new Date();
+    const weekAgo = new Date(now - 7 * 86400000);
+    const monthAgo = new Date(now - 30 * 86400000);
+
+    const wItems = items.filter(i => new Date(i.date) >= weekAgo);
+    const mItems = items.filter(i => new Date(i.date) >= monthAgo);
+
+    const wTotal = wItems.reduce((s, i) => s + i.total, 0);
+    const mTotal = mItems.reduce((s, i) => s + i.total, 0);
+
+    // Update Angka
+    animateNumber(document.getElementById('weeklyTotal'), wTotal);
+    animateNumber(document.getElementById('monthlyTotal'), mTotal);
+    
+    document.getElementById('weeklyCount').textContent = wItems.length;
+    document.getElementById('monthlyCount').textContent = `${mItems.length} barang`;
+}
+
+function animateNumber(element, target) {
+    const current = parseInt(element.dataset.value) || 0;
+    element.dataset.value = target;
+    
+    const duration = 1000; // 0.5 detik
+    const steps = 30;
+    const stepDuration = duration / steps;
+    const increment = (target - current) / steps;
+    
+    let step = 0;
+    const timer = setInterval(() => {
+        step++;
+        const value = Math.round(current + increment * step);
+        element.textContent = formatCurrency(value);
+        if (step >= steps) {
+            clearInterval(timer);
+            element.textContent = formatCurrency(target);
+        }
+    }, stepDuration);
+}
+
+function saveToStorage() { localStorage.setItem('belanja_items', JSON.stringify(items)); }
+function loadFromStorage() { const s = localStorage.getItem('belanja_items'); if(s) items = JSON.parse(s); }
+function triggerEntranceAnimations() { document.querySelectorAll('.animate-fade-in-up').forEach(el => el.style.opacity = '1'); }
+
+init();
+  </script>
+  </body>
+  </html>
